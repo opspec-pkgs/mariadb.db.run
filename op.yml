@@ -1,0 +1,36 @@
+description: Runs a MariaDB database.
+name: github.com/opspec-pkgs/mariadb.db.run
+opspec: 0.1.6
+version: 1.0.0
+inputs:
+  dbDataRootDir:
+    dir:
+      description: Directory to put the database data folder.
+  dbSchema:
+    string:
+      description: Name of the database to be created.
+      constraints: { minLength: 1 }
+  dbUsername:
+    string:
+      description: Username to connect to the database.
+      constraints: { minLength: 1 }
+  dbPassword:
+    string:
+      description: Password to connect to the database.
+      isSecret: true
+      constraints: { minLength: 1 }
+  dbHostname:
+    string:
+      description: Name for the MySQLDB container.
+      default: mariadb
+run:
+  container:
+    image: { ref: 'mariadb:11.3.2' }
+    name: $(dbHostname)
+    dirs: { '/var/lib/mysql': $(dbDataRootDir) }
+    envVars:
+      MARIADB_USER: $(dbUsername)
+      MARIADB_PASSWORD: $(dbPassword)
+      MARIADB_DATABASE: $(dbSchema)
+      MARIADB_ROOT_PASSWORD: $(dbPassword)
+    ports: { '3306': '3306' }
